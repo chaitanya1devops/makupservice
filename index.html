@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Amrutha Makeup Service</title>
+  <link rel="stylesheet" href="styles.css"> 
+  <style>
+
+    /* Global styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      color: #333;
+      line-height: 1.6;
+      //background-image: linear-gradient(to right, #ffe6e6 0%, #fff 50%, #ffe6e6 100%); /* Side design */
+    }
+
+    /* Header styles */
+    header {
+      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative; /* For effects */
+      overflow: hidden; /* For effects */
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 300%;
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      top: 0;
+      left: 0;
+      z-index: -1;
+      transition: transform 0.5s ease; /* Animation */
+      transform-origin: top left;
+      transform: scaleY(0);
+    }
+
+    header:hover::after {
+      transform: scaleY(1);
+    }
+    header h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+
+    /* Additional styles for Portfolio section */
+    .portfolio {
+      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      padding: 50px 20px;
+      text-align: center;
+    }
+
+    /* Rest of your existing styles */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+    
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+    }
+    
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    header {
+      background-color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Nav styles */
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    nav ul li {
+      margin-right: 20px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    nav ul li a:hover {
+      color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+    }
+    /* Specific section styles */
+    .services, .book-appointment, .contact, .portfolio {
+      padding: 50px 20px;
+      text-align: center;
+    }
+    
+    footer {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+    
+    /* Button styles */
+    button {
+      padding: 10px 20px;
+      background-color: #FF4081;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    button:hover {
+      background-color: #E91E63;
+    }
+    
+    /* Media queries for responsiveness */
+    @media screen and (max-width: 768px) {
+      /* Adjust styles for smaller screens */
+      header {
+        padding: 15px;
+      }
+    
+      /* Add more media queries for other sections if needed */
+    }
+    /* Small devices (phones) */
+    @media screen and (max-width: 576px) {
+      header {
+        padding: 15px;
+      }
+    
+      .services, .book-appointment, .contact, .portfolio {
+        padding: 30px 10px;
+      }
+    }
+    
+    /* Medium devices (tablets) */
+    @media screen and (min-width: 577px) and (max-width: 992px) {
+      header {
+        padding: 20px;
+      }
+    
+      .services, .book-appointment, .contact, .portfolio {
+        padding: 40px 20px;
+      }
+    }
+    
+    /* Large devices (desktops) */
+    @media screen and (min-width: 993px) {
+      header {
+        padding: 30px;
+      }
+    
+      .services, .book-appointment, .contact, .portfolio {
+        padding: 50px 30px;
+      }
+    }
+    /* Services section styles */
+    .services {
+      padding: 50px 20px;
+      text-align: center;
+      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      border-bottom: 1px solid #ddd;
+    }
+
+    .services h2 {
+      font-size: 36px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .services p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 40px;
+    }
+
+    /* Service cards */
+    .service {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 30px;
+      transition: transform 0.3s ease;
+    }
+
+    .service:hover {
+      transform: translateY(-10px);
+    }
+
+    .service h4 {
+      font-size: 24px;
+      color: #FF4081;
+      margin-bottom: 15px;
+    }
+
+    .service p {
+      font-size: 18px;
+      color: #555;
+      text-align: center;
+    }
+
+    /* Image styles */
+    .service img {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      object-fit: cover;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+  </style>
+</head>
+<body>
+
+ <header>
+    <h1>Amrutha Makeup Service</h1>
+    <nav>
+      <ul>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#book">Book Appointment</a></li>
+        <li><a href="#portfolio">Portfolio</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="services" id="services">
+    <h2>Discover Your Unique Style</h2>
+    <p>Explore a range of makeup services crafted to elevate your beauty. From glamorous evening looks to natural everyday makeup, we have it all.</p>
+    <div class="service">
+      <img src="wedding-makeup.png" alt="Wedding Makeup">
+      <h4>Wedding Makeup</h4>
+      <p>Your special day deserves the perfect look. Our expert makeup artists specialize in creating stunning bridal looks that accentuate your beauty and ensure you shine on your wedding day.</p>
+    </div>
+    <div class="service">
+      <img src="event-makeup.png" alt="Event Makeup">
+      <h4>Event Makeup</h4>
+      <p>Stand out at any event with our personalized event makeup services. Whether it's a gala, a corporate function, or a red-carpet event, we'll create a captivating look that matches the occasion.</p>
+    </div>
+    <div class="service">
+      <img src="makeup-tutorials.png" alt="Makeup Tutorials">
+      <h4>Makeup Tutorials</h4>
+      <p>Master the art of makeup with our comprehensive tutorials led by experienced artists. Learn professional techniques and pro tips to create flawless looks tailored to your style and preferences.</p>
+    </div>
+  </div>
+
+  
+  <div class="portfolio" id="portfolio">
+    <h2>Portfolio Showcase</h2>
+    <p>Take a peek at our gallery featuring some of our best work. Be inspired by the transformations we've created for our amazing clients.</p>
+    <div class="gallery">
+      <div class="gallery-item">
+        <img src="makeup-tutorials.png" alt="Portfolio Image 1">
+      </div>
+      <div class="gallery-item">
+        <img src="wedding-makeup.png" alt="Portfolio Image 2">
+      </div>
+      <div class="gallery-item">
+        <img src="event-makeup.png" alt="Portfolio Image 3">
+      </div>
+      <!-- Add more gallery items as needed -->
+    </div>
+  </div>
+
+  <div class="book-appointment" id="book">
+    <h2>Book Your Appointment</h2>
+    <p>Ready for a makeover? Schedule an appointment with our talented makeup artists. Get that personalized touch and leave feeling fabulous!</p>
+    <button onclick="location.href='https://example.com/book-appointment';">Book Now</button>
+  </div>
+  <div class="contact" id="contact">
+    <h2>Contact Us</h2>
+    <p>Have questions or special requests? Our team is here to assist you. Reach out via phone, email, or WhatsApp to discover how we can make you look and feel your best.</p>
+    <p>Email: info@examplemakeup.com</p>
+    <p>Call/WhatsApp: <a href="tel:99999999">99999999</a></p>
+  </div>
+
+  <footer>
+    <p>Join us on this beauty journey and let us bring out your inner glow! ✨</p>
+    <p>&copy; 2024 Amrutha Makeup Service</p>
+  </footer>
+
+</body>
+</html>
