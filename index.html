@@ -8,23 +8,22 @@
 
     /* Global styles */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Georgia', 'Times', serif;
       margin: 0;
       padding: 0;
-      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       color: #333;
       line-height: 1.6;
-      /* background-image: linear-gradient(to right, #ffe6e6 0%, #fff 50%, #ffe6e6 100%); /* Side design */
     }
 
     /* Header styles */
     header {
-      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       padding: 30px 20px;
       text-align: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: relative; /* For effects */
-      overflow: hidden; /* For effects */
+      position: relative;
+      overflow: hidden;
     }
 
     header::after {
@@ -32,11 +31,11 @@
       position: absolute;
       width: 100%;
       height: 300%;
-      background: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       top: 0;
       left: 0;
       z-index: -1;
-      transition: transform 0.5s ease; /* Animation */
+      transition: transform 0.5s ease;
       transform-origin: top left;
       transform: scaleY(0);
     }
@@ -44,20 +43,35 @@
     header:hover::after {
       transform: scaleY(1);
     }
+
     header h1 {
       font-size: 48px;
       margin-bottom: 10px;
-      color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      color: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       letter-spacing: 2px;
       text-transform: uppercase;
     }
 
-
-    /* Additional styles for Portfolio section */
+    /* Portfolio styles */
     .portfolio {
-      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       padding: 50px 20px;
       text-align: center;
+    }
+
+    /* Button styles */
+    button {
+      padding: 15px 30px;
+      background: #FF4081;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background: #E91E63;
     }
 
     /* Rest of your existing styles */
@@ -97,14 +111,7 @@
       border-radius: 8px;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
-    header {
-      background-color: #fff;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    /* Nav styles */
+
     nav ul {
       list-style: none;
       padding: 0;
@@ -125,45 +132,27 @@
     }
 
     nav ul li a:hover {
-      color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      color: linear-gradient(120deg, #FF4081, #fff, #FF4081);
     }
-    /* Specific section styles */
+
     .services, .book-appointment, .contact, .portfolio {
       padding: 50px 20px;
       text-align: center;
     }
     
     footer {
-      background-color: #333;
+      background: #333;
       color: #fff;
       text-align: center;
       padding: 20px 0;
     }
     
-    /* Button styles */
-    button {
-      padding: 10px 20px;
-      background-color: #FF4081;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    
-    button:hover {
-      background-color: #E91E63;
-    }
-    
-    /* Media queries for responsiveness */
     @media screen and (max-width: 768px) {
-      /* Adjust styles for smaller screens */
       header {
         padding: 15px;
       }
-    
-      /* Add more media queries for other sections if needed */
     }
-    /* Small devices (phones) */
+
     @media screen and (max-width: 576px) {
       header {
         padding: 15px;
@@ -174,7 +163,6 @@
       }
     }
     
-    /* Medium devices (tablets) */
     @media screen and (min-width: 577px) and (max-width: 992px) {
       header {
         padding: 20px;
@@ -185,7 +173,6 @@
       }
     }
     
-    /* Large devices (desktops) */
     @media screen and (min-width: 993px) {
       header {
         padding: 30px;
@@ -195,11 +182,11 @@
         padding: 50px 30px;
       }
     }
-    /* Services section styles */
+
     .services {
       padding: 50px 20px;
       text-align: center;
-      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       border-bottom: 1px solid #ddd;
     }
 
@@ -216,13 +203,12 @@
       margin-bottom: 40px;
     }
 
-    /* Service cards */
     .service {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background-color: linear-gradient(120deg, #FF4081, #fff, #FF4081); /* Gradient effect */
+      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       padding: 30px;
@@ -246,7 +232,6 @@
       text-align: center;
     }
 
-    /* Image styles */
     .service img {
       width: 200px;
       height: 200px;
@@ -260,7 +245,7 @@
 </head>
 <body>
 
- <header>
+  <header>
     <h1>Amrutha Makeup Service</h1>
     <nav>
       <ul>
@@ -292,7 +277,6 @@
     </div>
   </div>
 
-  
   <div class="portfolio" id="portfolio">
     <h2>Portfolio Showcase</h2>
     <p>Take a peek at our gallery featuring some of our best work. Be inspired by the transformations we've created for our amazing clients.</p>
@@ -308,6 +292,7 @@
       </div>
       <!-- Add more gallery items as needed -->
     </div>
+    <button>View Full Portfolio</button>
   </div>
 
   <div class="book-appointment" id="book">
