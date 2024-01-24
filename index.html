@@ -17,14 +17,14 @@
     }
 
     /* Header styles */
-    header {
-      background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
-      padding: 30px 20px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: relative;
-      overflow: hidden;
-    }
+header {
+  background: linear-gradient(120deg, #FF4081, #fff, #FF4081);
+  padding: 20px 10px; /* Adjusted padding */
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
 
     header::after {
       content: "";
@@ -44,13 +44,13 @@
       transform: scaleY(1);
     }
 
-    header h1 {
-      font-size: 48px;
-      margin-bottom: 10px;
-      color: linear-gradient(120deg, #FF4081, #fff, #FF4081);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
+header h1 {
+  font-size: 36px; /* Adjusted font size */
+  margin-bottom: 10px;
+  color: linear-gradient(120deg, #FF4081, #fff, #FF4081);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
 
     /* Portfolio styles */
     .portfolio {
@@ -123,7 +123,9 @@
     nav ul li {
       margin-right: 20px;
     }
-
+nav ul li.active a {
+  color: #FF4081; /* Highlight color for active link */
+}
     nav ul li a {
       text-decoration: none;
       color: #333;
@@ -140,13 +142,13 @@
       text-align: center;
     }
     
-    footer {
-      background: #333;
-      color: #fff;
-      text-align: center;
-      padding: 20px 0;
-    }
-    
+/* Footer styles */
+footer {
+  background: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px 0; /* Adjusted padding */
+}
     @media screen and (max-width: 768px) {
       header {
         padding: 15px;
@@ -247,7 +249,8 @@
 
   <header>
     <h1>Amrutha Makeup Service</h1>
-     <div class="contact-details">
+	   <div class="contact-details">
+
       <p>Call/WhatsApp: <a href="tel:8332809534" style="color: #000;">8332809534</a></p>
     </div>
     <nav>
@@ -267,7 +270,9 @@
       <img src="wedding-makeup.png" alt="Wedding Makeup">
       <h4>Wedding Makeup</h4>
       <p>Your special day deserves the perfect look. Our expert makeup artists specialize in creating stunning bridal looks that accentuate your beauty and ensure you shine on your wedding day.</p>
-    </div>
+        <p>We use premium makeup products from top brands like M.A.C., Lakme, Maybelline, L'Oréal Professional, and more to achieve a flawless and long-lasting bridal makeup look. These brands are known for their quality and are trusted by professionals worldwide.</p>
+
+	</div>
     <div class="service">
       <img src="event-makeup.png" alt="Event Makeup">
       <h4>Event Makeup</h4>
@@ -297,19 +302,19 @@
     </div>
     <button>View Full Portfolio</button>
   </div>
-
+  <div class="contact" id="contact">
+    <h2>Contact Us</h2>
+    <p>Have questions or special requests? Our team is here to assist you. Reach out via phone, email, or WhatsApp to discover how we can make you look and feel your best.</p>
+    <p>Email: infrastructurepoc@gmail.com</p>
+    <p>Call/WhatsApp: <a href="tel:8332809534">8332809534</a></p>
+  </div>
   <div class="book-appointment" id="book">
     <h2>Book Your Appointment</h2>
     <p>Ready for a makeover? Schedule an appointment with our talented makeup artists. Get that personalized touch and leave feeling fabulous!</p>
     <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSemBh01FpCtL2iFagtfCBYsFEPHDJR3VSY74VNL-her8xu8xQ/viewform?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
   </div>
   
-  <div class="contact" id="contact">
-    <h2>Contact Us</h2>
-    <p>Have questions or special requests? Our team is here to assist you. Reach out via phone, email, or WhatsApp to discover how we can make you look and feel your best.</p>
-    <p>Email: infrastructurepoc@gmail.com</p>
-    <p>Call/WhatsApp: <a href="tel:8310385408">8310385408</a></p>
-  </div>
+
 
   <footer>
     <p>Join us on this beauty journey and let us bring out your inner glow! ✨</p>
