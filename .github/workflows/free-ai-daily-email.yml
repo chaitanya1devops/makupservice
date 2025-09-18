@@ -63,16 +63,14 @@ jobs:
 
           echo "dow=$DOWL" >> $GITHUB_OUTPUT
 
-      - name: Generate email with free OSS model
+      - name: Generate HTML email with free OSS model
         id: gen
         shell: bash
         run: |
           cat > gen_email.py << 'PY'
-          import os, datetime, textwrap, pandas as pd
+          import os, datetime
           from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-          # Tiny, permissive model (Apache-2.0) suitable for CPU:
-          # SmolLM2-360M-Instruct ~140–180MB download
           MODEL_ID = "HuggingFaceTB/SmolLM2-360M-Instruct"
 
           def read(path):
@@ -83,16 +81,21 @@ jobs:
           datenote  = read("/tmp/datenote.md")
           todaylist = read("/tmp/todaylist.txt")
 
-          today = datetime.datetime.now().strftime("%a, %d %b %Y")
-          sys_prompt = (
+          today_human = datetime.datetime.now().strftime("%a, %d %b %Y")
+
+          system_prompt = (
             "You are a concise executive assistant. "
-            "Write a warm, focused morning email with sections: Schedule, Top 3 Priorities, Quick Wins. "
-            "Keep under 200 words. Use clear bullets. End with a one-line motivational nudge. "
-            "If 14:00 punch-in or 23:00 punch-out are missing, include them in Schedule."
+            "Write a morning email as clean HTML5 (no external CSS/JS). "
+            "Sections: <h2>Schedule</h2>, <h2>Top 3 Priorities</h2>, <h2>Quick Wins</h2>. "
+            "Use <ul><li> bullets, keep total under 220 words, and end with a one-line motivational nudge in <blockquote>. "
+            "If 14:00 punch-in or 23:00 punch-out are missing, include them in Schedule. "
+            "Return ONLY a complete HTML document starting with <!doctype html>."
           )
 
-          user_context = f"""
-          Date: {today}
+          user_prompt = f"""
+          Context
+          -------
+          Date: {today_human}
           Fixed routine (Mon–Fri):
           ---
           {routine}
@@ -109,6 +112,11 @@ jobs:
           ---
           {todaylist}
           ---
+
+          Requirements
+          ------------
+          - Subject line (text only): Today’s Plan — {today_human}
+          - Then full HTML email body (complete HTML doc)
           """
 
           tok = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
@@ -116,29 +124,33 @@ jobs:
           gen = pipeline("text-generation", model=mdl, tokenizer=tok, device_map="auto")
 
           prompt = (
-              f"<|system|>\n{sys_prompt}\n</|system|>\n"
-              f"<|user|>\n{user_context}\nWrite subject line as the first line: 'Today’s Plan — {today}'. "
-              f"Then the email body on following lines.\n</|user|>\n<|assistant|>\n"
+            f"<|system|>\n{system_prompt}\n</|system|>\n"
+            f"<|user|>\n{user_prompt}\n</|user|>\n<|assistant|>\n"
           )
 
-          out = gen(prompt, max_new_tokens=350, do_sample=True, temperature=0.6, top_p=0.9)[0]["generated_text"]
-          # Extract assistant reply after the last assistant tag if present
-          body_start = out.rfind("<|assistant|>")
-          content = out[body_start+len("<|assistant|>"):] if body_start != -1 else out
+          out = gen(prompt, max_new_tokens=550, do_sample=True, temperature=0.6, top_p=0.9)[0]["generated_text"]
+          # Extract just the assistant part if tags leaked
+          start = out.rfind("<|assistant|>")
+          content = out[start+len("<|assistant|>"):] if start != -1 else out
 
-          # First line is subject; rest is body
-          lines = [l for l in content.strip().splitlines() if l.strip()]
-          subject = lines[0] if lines else f"Today’s Plan — {today}"
-          email_body = "\n".join(lines[1:]) if len(lines) > 1 else "Have a focused day!"
+          # First line is the subject, then the HTML
+          lines = [l for l in content.splitlines() if l.strip()]
+          subject = lines[0].strip() if lines else f"Today’s Plan — {today_human}"
+          html = "\n".join(lines[1:]).strip() if len(lines) > 1 else f"<!doctype html><html><body><p>Have a focused day!</p></body></html>"
 
-          with open("subject.txt", "w", encoding="utf-8") as f: f.write(subject.strip())
-          with open("body.txt", "w", encoding="utf-8") as f:  f.write(email_body.strip())
+          # Minimal guard: ensure we have an HTML doc
+          if "<html" not in html.lower():
+            html = f"<!doctype html><html><body>{html}</body></html>"
+
+          open("subject.txt","w",encoding="utf-8").write(subject)
+          open("body.html","w",encoding="utf-8").write(html)
           PY
+
           python gen_email.py
           echo "subject=$(cat subject.txt)" >> $GITHUB_OUTPUT
-          echo "bodyfile=body.txt" >> $GITHUB_OUTPUT
+          echo "htmlfile=body.html" >> $GITHUB_OUTPUT
 
-      - name: Send email
+      - name: Send email (HTML)
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_HOST }}
@@ -148,5 +160,4 @@ jobs:
           from: ${{ secrets.MAIL_FROM }}
           to: ${{ secrets.MAIL_TO }}
           subject: ${{ steps.gen.outputs.subject }}
-          body: file:${{ steps.gen.outputs.bodyfile }}
-
+          html_body: file:${{ steps.gen.outputs.htmlfile }}
