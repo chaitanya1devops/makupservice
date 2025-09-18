@@ -6,7 +6,7 @@ on:
     - cron: "30 2 * * 1-5"
   workflow_dispatch: {}
 
-# ✅ give the workflow token rights to create/comment on issues
+# The token must be able to create/comment on issues
 permissions:
   contents: read
   issues: write
@@ -24,6 +24,7 @@ jobs:
         id: build
         run: |
           TODAY=$(date +"%A, %d %B %Y")
+          # Write the markdown body using a quoted heredoc so YAML/shell won't parse emojis or asterisks
           cat > body.md <<'MD'
 **🚀 Good Morning, Chaitanya!**
 
@@ -48,31 +49,29 @@ Here’s your energetic plan for **${TODAY}** — let’s own the day! 💪
 
 > “Small consistent steps beat giant occasional leaps.” ✅
 MD
+          # inject today's date into the template
           sed -i "s|\${TODAY}|$TODAY|g" body.md
-          echo "subject=Your Energetic Daily Plan 🚀 — ${TODAY}" >> $GITHUB_OUTPUT
-          echo "bodyfile=body.md" >> $GITHUB_OUTPUT
+          echo "bodyfile=body.md" >> "$GITHUB_OUTPUT"
+          echo "subject=Your Energetic Daily Plan 🚀 — ${TODAY}" >> "$GITHUB_OUTPUT"
 
       - name: Ensure rolling issue exists (create if missing)
-        id: ensure-issue
+        id: ensure_issue
         uses: actions/github-script@v7
         with:
           script: |
             const {owner, repo} = context.repo;
             const title = process.env.ISSUE_TITLE;
 
-            // List open issues and find by exact title (avoids advanced search deprecation)
-            let page = 1, issueNumber = null;
+            // list open issues and find exact title (no advanced search)
+            let page = 1, found = null;
             while (true) {
-              const res = await github.rest.issues.listForRepo({
-                owner, repo, state: 'open', per_page: 100, page
-              });
-              const match = res.data.find(i => i.title === title);
-              if (match) { issueNumber = match.number; break; }
-              if (res.data.length < 100) break;
+              const res = await github.rest.issues.listForRepo({owner, repo, state: 'open', per_page: 100, page});
+              found = res.data.find(i => i.title === title);
+              if (found || res.data.length < 100) break;
               page++;
             }
 
-            if (!issueNumber) {
+            if (!found) {
               const created = await github.rest.issues.create({
                 owner, repo,
                 title,
@@ -80,24 +79,35 @@ MD
                 assignees: [process.env.USERNAME],
                 labels: ["daily-notify"]
               });
-              issueNumber = created.data.number;
+              found = created.data;
             }
 
-            core.setOutput('issue', issueNumber.toString());
+            core.setOutput('issue_number', String(found.number));
 
       - name: Post today’s plan as a comment (triggers GitHub email)
         uses: actions/github-script@v7
+        env:
+          BODY_PATH: ${{ steps.build.outputs.bodyfile }}
+          USERNAME: ${{ env.USERNAME }}
+          ISSUE_NUMBER: ${{ steps.ensure_issue.outputs.issue_number }}
         with:
           script: |
             const {owner, repo} = context.repo;
             const fs = require('fs');
-            const issueNumber = Number('${{ steps.ensure-issue.outputs.issue }}');
-            const body = fs.readFileSync(`${process.env.GITHUB_WORKSPACE}/${{ steps.build.outputs.bodyfile }}`, 'utf8');
-            const text = `@${process.env.USERNAME}\n\n${body}`;
+            const bodyMd = fs.readFileSync(process.env.BODY_PATH, 'utf8');
+            const text = `@${process.env.USERNAME}\n\n${bodyMd}`;
 
-            // Ensure you're assigned (assignment also triggers notifications)
-            await github.rest.issues.addAssignees({ owner, repo, issue_number: issueNumber, assignees: [process.env.USERNAME] });
-            await github.rest.issues.createComment({ owner, repo, issue_number: issueNumber, body: text });
+            await github.rest.issues.addAssignees({
+              owner, repo,
+              issue_number: Number(process.env.ISSUE_NUMBER),
+              assignees: [process.env.USERNAME]
+            });
+
+            await github.rest.issues.createComment({
+              owner, repo,
+              issue_number: Number(process.env.ISSUE_NUMBER),
+              body: text
+            });
 
       - name: Log preview (subject + markdown)
         run: |
