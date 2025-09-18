@@ -19,6 +19,7 @@ jobs:
       USERNAME: chaitanya1devops             # <-- change if your GitHub username differs
       ISSUE_TITLE: "Daily Plan Notifications" # one rolling issue reused daily
       HCM_LINK: "https://iazmqy.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome"
+
     steps:
       - name: Checkout (optional files support)
         uses: actions/checkout@v4
@@ -35,7 +36,6 @@ jobs:
 
           # Optional extra sections from repo (silently ignored if missing)
           read_file() { [ -f "$1" ] && cat "$1" || true; }
-
           ROUTINE="$(read_file tasks/routine.md)"
           WD_NOTE="$(read_file tasks/weekdays/${DOW3}.md)"
           DATE_NOTE="$(read_file tasks/dates/${TODAY_ISO}.md)"
@@ -58,7 +58,7 @@ jobs:
           QIDX=$(( RANDOM % ${#QUOTES[@]} ))
           QUOTE="${QUOTES[$QIDX]}"
 
-          # Build Markdown body
+          # Build Markdown body (quoted heredoc prevents parsing issues)
           cat > body.md <<'MD'
 **🚀 Good Morning, Chaitanya!**
 
@@ -75,47 +75,47 @@ Here’s your energetic plan for **${TODAY}** — let’s own the day! 💪
 - 🕚 **11:00** – Punch out
 - 🏠 **11:30–12:30** – Personal time
 - 🌙 **1:00** – Sleep & recharge
-
 MD
 
           # Optional extras if present
           if [ -n "$ROUTINE" ]; then
             {
+              echo ""
               echo "### 📋 Your routine file"
               echo ""
               echo "$ROUTINE"
-              echo ""
             } >> body.md
           fi
 
           if [ -n "$WD_NOTE" ]; then
             {
+              echo ""
               echo "### 🗓️ Today’s weekday notes"
               echo ""
               echo "$WD_NOTE"
-              echo ""
             } >> body.md
           fi
 
           if [ -n "$DATE_NOTE" ]; then
             {
+              echo ""
               echo "### 📅 Date-specific notes"
               echo ""
               echo "$DATE_NOTE"
-              echo ""
             } >> body.md
           fi
 
           if [ -n "$CSV_TODAY" ]; then
             {
+              echo ""
               echo "### ⏱️ Scheduled for today"
               echo ""
               echo "$CSV_TODAY"
-              echo ""
             } >> body.md
           fi
 
           {
+            echo ""
             echo "### 🔥 Quick Wins"
             echo "1. Triage emails & tickets (10m)"
             echo "2. Clear yesterday’s blockers (5m)"
@@ -171,19 +171,19 @@ MD
           script: |
             const {owner, repo} = context.repo;
             const fs = require('fs');
+            const issueNumber = Number(process.env.ISSUE_NUMBER);
             const bodyMd = fs.readFileSync(process.env.BODY_PATH, 'utf8');
             const text = `@${process.env.USERNAME}\n\n${bodyMd}`;
 
-            // Assign + comment to maximize notifications
             await github.rest.issues.addAssignees({
               owner, repo,
-              issue_number: Number(process.env.ISSUE_NUMBER),
+              issue_number: issueNumber,
               assignees: [process.env.USERNAME]
             });
 
             await github.rest.issues.createComment({
               owner, repo,
-              issue_number: Number(process.env.ISSUE_NUMBER),
+              issue_number: issueNumber,
               body: text
             });
 
