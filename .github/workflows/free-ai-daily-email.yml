@@ -6,7 +6,7 @@ on:
     - cron: "30 2 * * 1-5"
   workflow_dispatch: {}
 
-# The token must be able to create/comment on issues
+# Token needs write access to create/comment on issues
 permissions:
   contents: read
   issues: write
@@ -16,15 +16,49 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TZ: Asia/Kolkata
-      USERNAME: chaitanya1devops
-      ISSUE_TITLE: "Daily Plan Notifications"
-
+      USERNAME: chaitanya1devops             # <-- change if your GitHub username differs
+      ISSUE_TITLE: "Daily Plan Notifications" # one rolling issue reused daily
+      HCM_LINK: "https://iazmqy.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome"
     steps:
-      - name: Compose energetic message (Markdown)
+      - name: Checkout (optional files support)
+        uses: actions/checkout@v4
+
+      - name: Build energetic message (Markdown + optional extras)
         id: build
+        shell: bash
         run: |
-          TODAY=$(date +"%A, %d %B %Y")
-          # Write the markdown body using a quoted heredoc so YAML/shell won't parse emojis or asterisks
+          set -euo pipefail
+
+          TODAY_HUMAN=$(date +"%A, %d %B %Y")
+          DOW3=$(date +%a | tr '[:upper:]' '[:lower:]')   # mon/tue/wed...
+          TODAY_ISO=$(date +%F)
+
+          # Optional extra sections from repo (silently ignored if missing)
+          read_file() { [ -f "$1" ] && cat "$1" || true; }
+
+          ROUTINE="$(read_file tasks/routine.md)"
+          WD_NOTE="$(read_file tasks/weekdays/${DOW3}.md)"
+          DATE_NOTE="$(read_file tasks/dates/${TODAY_ISO}.md)"
+
+          # Optional CSV: tasks/tasks.csv [date,time,task]
+          CSV_TODAY=""
+          if [ -f tasks/tasks.csv ]; then
+            CSV_TODAY=$(awk -F, -v d="$TODAY_ISO" 'NR>1 && $1==d {print "- " $2 " — " $3}' tasks/tasks.csv | sort)
+          fi
+
+          # Lightweight "AI-ish" quote list (no external calls)
+          QUOTES=(
+            "Small consistent steps beat giant occasional leaps."
+            "Discipline is the bridge between goals and accomplishment."
+            "Focus on the next right move."
+            "Momentum comes from starting."
+            "Win the morning, win the day."
+            "Progress, not perfection."
+          )
+          QIDX=$(( RANDOM % ${#QUOTES[@]} ))
+          QUOTE="${QUOTES[$QIDX]}"
+
+          # Build Markdown body
           cat > body.md <<'MD'
 **🚀 Good Morning, Chaitanya!**
 
@@ -37,22 +71,65 @@ Here’s your energetic plan for **${TODAY}** — let’s own the day! 💪
 - 💡 **11:30–12:30** – Personal activities
 - 🧑‍💼 **12:30–1:30** – Get ready for office
 - 🚕 **1:30** – Cab pickup
-- 💻 **2:00** – Punch in & start strong
+- 💻 **2:00** – Punch in & start strong ([Open HCM](${HCM_LINK}))
 - 🕚 **11:00** – Punch out
 - 🏠 **11:30–12:30** – Personal time
 - 🌙 **1:00** – Sleep & recharge
 
-### 🔥 Quick Wins
-1. Triage emails & tickets (10m)  
-2. Clear yesterday’s blockers (5m)  
-3. Start one high-impact task
-
-> “Small consistent steps beat giant occasional leaps.” ✅
 MD
-          # inject today's date into the template
-          sed -i "s|\${TODAY}|$TODAY|g" body.md
+
+          # Optional extras if present
+          if [ -n "$ROUTINE" ]; then
+            {
+              echo "### 📋 Your routine file"
+              echo ""
+              echo "$ROUTINE"
+              echo ""
+            } >> body.md
+          fi
+
+          if [ -n "$WD_NOTE" ]; then
+            {
+              echo "### 🗓️ Today’s weekday notes"
+              echo ""
+              echo "$WD_NOTE"
+              echo ""
+            } >> body.md
+          fi
+
+          if [ -n "$DATE_NOTE" ]; then
+            {
+              echo "### 📅 Date-specific notes"
+              echo ""
+              echo "$DATE_NOTE"
+              echo ""
+            } >> body.md
+          fi
+
+          if [ -n "$CSV_TODAY" ]; then
+            {
+              echo "### ⏱️ Scheduled for today"
+              echo ""
+              echo "$CSV_TODAY"
+              echo ""
+            } >> body.md
+          fi
+
+          {
+            echo "### 🔥 Quick Wins"
+            echo "1. Triage emails & tickets (10m)"
+            echo "2. Clear yesterday’s blockers (5m)"
+            echo "3. Start one high-impact task"
+            echo ""
+            echo "> “${QUOTE}” ✅"
+          } >> body.md
+
+          # Inject dynamic values into template placeholders
+          sed -i "s|\${TODAY}|${TODAY_HUMAN}|g" body.md
+          sed -i "s|\${HCM_LINK}|${HCM_LINK}|g" body.md
+
           echo "bodyfile=body.md" >> "$GITHUB_OUTPUT"
-          echo "subject=Your Energetic Daily Plan 🚀 — ${TODAY}" >> "$GITHUB_OUTPUT"
+          echo "subject=Your Energetic Daily Plan 🚀 — ${TODAY_HUMAN}" >> "$GITHUB_OUTPUT"
 
       - name: Ensure rolling issue exists (create if missing)
         id: ensure_issue
@@ -62,7 +139,7 @@ MD
             const {owner, repo} = context.repo;
             const title = process.env.ISSUE_TITLE;
 
-            // list open issues and find exact title (no advanced search)
+            // List open issues and find exact title (avoids advanced search)
             let page = 1, found = null;
             while (true) {
               const res = await github.rest.issues.listForRepo({owner, repo, state: 'open', per_page: 100, page});
@@ -97,6 +174,7 @@ MD
             const bodyMd = fs.readFileSync(process.env.BODY_PATH, 'utf8');
             const text = `@${process.env.USERNAME}\n\n${bodyMd}`;
 
+            // Assign + comment to maximize notifications
             await github.rest.issues.addAssignees({
               owner, repo,
               issue_number: Number(process.env.ISSUE_NUMBER),
