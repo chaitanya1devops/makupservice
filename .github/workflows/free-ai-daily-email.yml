@@ -12,40 +12,38 @@ jobs:
     env:
       TZ: Asia/Kolkata
       USERNAME: chaitanya1devops         # <- your GitHub username
-      ISSUE_TITLE: "Daily Plan Notifications"  # single rolling issue
+      ISSUE_TITLE: "Daily Plan Notifications"
     steps:
       - name: Compose energetic message (Markdown)
         id: build
         run: |
           TODAY=$(date +"%A, %d %B %Y")
           cat > body.md <<'MD'
-**🚀 Good Morning, Chaitanya!**
-
-Here’s your energetic plan for **${TODAY}** — let’s own the day! 💪
-
-### ✨ Routine (Mon–Fri)
-- ⏰ **8:00** – Wake up & energize  
-- 📚 **8:00–10:00** – Learning / personal activities  
-- 🏋️ **10:00–11:30** – Gym  
-- 💡 **11:30–12:30** – Personal activities  
-- 🧑‍💼 **12:30–1:30** – Get ready for office  
-- 🚕 **1:30** – Cab pickup  
-- 💻 **2:00** – Punch in & start strong  
-- 🕚 **11:00** – Punch out  
-- 🏠 **11:30–12:30** – Personal time  
-- 🌙 **1:00** – Sleep & recharge  
-
-### 🔥 Quick Wins
-1. Triage emails & tickets (10m)  
-2. Clear yesterday’s blockers (5m)  
-3. Start one high-impact task
-
-> “Small consistent steps beat giant occasional leaps.” ✅
-MD
-          # inject date into template
-          sed -i "s|\${TODAY}|$TODAY|g" body.md
-
-          echo "subject=Your Energetic Daily Plan — ${TODAY}" >> $GITHUB_OUTPUT
+              **🚀 Good Morning, Chaitanya!**
+              
+              Here’s your energetic plan for **${TODAY}** — let’s own the day! 💪
+              
+              ### ✨ Routine (Mon–Fri)
+              - ⏰ **8:00** – Wake up & energize
+              - 📚 **8:00–10:00** – Learning / personal activities
+              - 🏋️ **10:00–11:30** – Gym
+              - 💡 **11:30–12:30** – Personal activities
+              - 🧑‍💼 **12:30–1:30** – Get ready for office
+              - 🚕 **1:30** – Cab pickup
+              - 💻 **2:00** – Punch in & start strong
+              - 🕚 **11:00** – Punch out
+              - 🏠 **11:30–12:30** – Personal time
+              - 🌙 **1:00** – Sleep & recharge
+              
+              ### 🔥 Quick Wins
+              1. Triage emails & tickets (10m)  
+              2. Clear yesterday’s blockers (5m)  
+              3. Start one high-impact task
+              
+              > “Small consistent steps beat giant occasional leaps.” ✅
+              MD
+                        sed -i "s|\${TODAY}|$TODAY|g" body.md
+          echo "subject=Your Energetic Daily Plan 🚀 — ${TODAY}" >> $GITHUB_OUTPUT
           echo "bodyfile=body.md" >> $GITHUB_OUTPUT
 
       - name: Ensure rolling issue exists (create if missing)
@@ -55,7 +53,6 @@ MD
           script: |
             const {owner, repo} = context.repo;
             const title = process.env.ISSUE_TITLE;
-            // search for an open issue with this exact title
             const issues = await github.rest.search.issuesAndPullRequests({
               q: `repo:${owner}/${repo} is:issue is:open in:title "${title}"`
             });
@@ -81,7 +78,6 @@ MD
             const {owner, repo} = context.repo;
             const fs = require('fs');
             const body = fs.readFileSync(`${process.env.GITHUB_WORKSPACE}/${{ steps.build.outputs.bodyfile }}`, 'utf8');
-            // mention + assign to ensure email notification
             const text = `@${process.env.USERNAME}\n\n${body}`;
             await github.rest.issues.addAssignees({
               owner, repo, issue_number: Number('${{ steps.ensure-issue.outputs.issue }}'),
